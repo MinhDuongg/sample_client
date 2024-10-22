@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class RequestOptions {
+    @Getter
     Authorization authenticator;
     private final String idempotencyKey;
     private final String actorType;
@@ -52,7 +53,10 @@ public class RequestOptions {
     }
 
     public String getApiKey() {
-        return authenticator.getApiKey();
+        if (authenticator instanceof DefaultAuthorization) {
+            return ((DefaultAuthorization) authenticator).getApiKey();
+        }
+        return null;
     }
 
     public String getIdempotencyKey() {
@@ -116,7 +120,10 @@ public class RequestOptions {
         }
 
         public String getApiKey() {
-            return this.authenticator.getApiKey();
+            if (authenticator instanceof DefaultAuthorization) {
+                return ((DefaultAuthorization) authenticator).getApiKey();
+            }
+            return null;
         }
 
         public String getActorId() {
