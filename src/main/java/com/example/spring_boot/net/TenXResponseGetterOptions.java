@@ -7,6 +7,8 @@ import java.net.Proxy;
 public abstract class TenXResponseGetterOptions {
     public abstract Authorization getAuthenticator();
 
+    public abstract String getActorType();
+
     public abstract String getActorId();
 
     public abstract int getConnectTimeout();

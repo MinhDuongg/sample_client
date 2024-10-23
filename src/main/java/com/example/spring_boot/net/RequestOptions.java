@@ -1,6 +1,7 @@
 package com.example.spring_boot.net;
 
 import lombok.Getter;
+import lombok.Setter;
 
 import java.lang.reflect.Array;
 import java.net.PasswordAuthentication;
@@ -97,15 +98,25 @@ public class RequestOptions {
 
     public static class RequestOptionsBuilder {
         protected Authorization authenticator;
+        @Getter
         protected String idempotencyKey;
+        @Getter
         protected String actorType;
+        @Getter
         protected String actorId;
+        @Getter
         protected String baseUrl;
 
+        @Getter
         protected Integer connectTimeout;
+        @Getter
+        @Setter
         protected Integer readTimeout;
+        @Getter
         protected Integer maxNetworkRetries;
+        @Getter
         protected Proxy connectionProxy;
+        @Getter
         protected PasswordAuthentication proxyCredential;
 
         public RequestOptionsBuilder() {}
@@ -126,17 +137,9 @@ public class RequestOptions {
             return null;
         }
 
-        public String getActorId() {
-            return actorId;
-        }
-
         public RequestOptionsBuilder setActorId(String actorId) {
             this.actorId = actorId;
             return this;
-        }
-
-        public PasswordAuthentication getProxyCredential() {
-            return proxyCredential;
         }
 
         public RequestOptionsBuilder setProxyCredential(PasswordAuthentication proxyCredential) {
@@ -144,17 +147,9 @@ public class RequestOptions {
             return this;
         }
 
-        public Proxy getConnectionProxy() {
-            return connectionProxy;
-        }
-
         public RequestOptionsBuilder setConnectionProxy(Proxy connectionProxy) {
             this.connectionProxy = connectionProxy;
             return this;
-        }
-
-        public Integer getMaxNetworkRetries() {
-            return maxNetworkRetries;
         }
 
         public RequestOptionsBuilder setMaxNetworkRetries(Integer maxNetworkRetries) {
@@ -162,25 +157,9 @@ public class RequestOptions {
             return this;
         }
 
-        public Integer getReadTimeout() {
-            return readTimeout;
-        }
-
-        public void setReadTimeout(Integer readTimeout) {
-            this.readTimeout = readTimeout;
-        }
-
-        public Integer getConnectTimeout() {
-            return connectTimeout;
-        }
-
         public RequestOptionsBuilder setConnectTimeout(Integer connectTimeout) {
             this.connectTimeout = connectTimeout;
             return this;
-        }
-
-        public String getBaseUrl() {
-            return baseUrl;
         }
 
         public RequestOptionsBuilder setBaseUrl(final String baseUrl) {
@@ -188,17 +167,9 @@ public class RequestOptions {
             return this;
         }
 
-        public String getActorType() {
-            return actorType;
-        }
-
         public RequestOptionsBuilder setActorType(String actorType) {
             this.actorType = actorType;
             return this;
-        }
-
-        public String getIdempotencyKey() {
-            return idempotencyKey;
         }
 
         public RequestOptionsBuilder setIdempotencyKey(String idempotencyKey) {
@@ -285,8 +256,49 @@ public class RequestOptions {
         return normalized;
     }
 
+    static RequestOptions merge(TenXResponseGetterOptions clientOptions, RequestOptions options) {
+        if (options == null) {
+            return new RequestOptions(
+                    clientOptions.getAuthenticator(), // authenticator
+                    null, // idempotencyKey
+                    clientOptions.getActorType(),
+                    clientOptions.getActorId(), // actorId
+                    null, // baseUrl
+                    clientOptions.getConnectTimeout(), // connectTimeout
+                    clientOptions.getReadTimeout(), // readTimeout
+                    clientOptions.getMaxNetworkRetries(), // maxNetworkRetries
+                    clientOptions.getConnectionProxy(), // connectionProxy
+                    clientOptions.getProxyCredential() // proxyCredential
+            );
+        }
+        return new RequestOptions(
+                options.getAuthenticator() != null
+                        ? options.getAuthenticator()
+                        : clientOptions.getAuthenticator(),
+                options.getIdempotencyKey(),
+                options.getActorType() != null ? options.getActorType() : clientOptions.getActorType(),
+                options.getActorId() != null
+                        ? options.getActorId()
+                        : clientOptions.getActorId(),
+                options.getBaseUrl(),
+                options.getConnectTimeout() != null
+                        ? options.getConnectTimeout()
+                        : clientOptions.getConnectTimeout(),
+                options.getReadTimeout() != null
+                        ? options.getReadTimeout()
+                        : clientOptions.getReadTimeout(),
+                options.getMaxNetworkRetries() != null
+                        ? options.getMaxNetworkRetries()
+                        : clientOptions.getMaxNetworkRetries(),
+                options.getConnectionProxy() != null
+                        ? options.getConnectionProxy()
+                        : clientOptions.getConnectionProxy(),
+                options.getProxyCredential() != null
+                        ? options.getProxyCredential()
+                        : clientOptions.getProxyCredential());
+    }
+
     public static class InvalidRequestOptionsException extends RuntimeException {
-        private static final long serialVersionUID = 1L;
 
         public InvalidRequestOptionsException(String message) {
             super(message);

@@ -21,6 +21,11 @@ public class GlobalTenXResponseGetterOptions extends TenXResponseGetterOptions {
     }
 
     @Override
+    public String getActorType() {
+        return TenX.getActorType();
+    }
+
+    @Override
     public int getReadTimeout() {
         return TenX.getReadTimeout();
     }
@@ -47,7 +52,7 @@ public class GlobalTenXResponseGetterOptions extends TenXResponseGetterOptions {
 
     @Override
     public String getActorId() {
-        return TenX.actorId;
+        return TenX.getActorId();
     }
 
     @Override

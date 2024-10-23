@@ -1,5 +1,6 @@
 package com.example.spring_boot.model;
 
+import com.example.spring_boot.net.ApiResource;
 import com.example.spring_boot.net.TenXResponse;
 
 import java.lang.reflect.Field;
@@ -80,23 +81,40 @@ public class TenXObject implements TenXObjectInterface {
         this.lastResponse = response;
     }
 
-    static TenXResponse deserializeStripeObject(
-            JsonObject eventDataObjectJson, TenXResponseGetter responseGetter) {
-        String type = eventDataObjectJson.getAsJsonObject().get("object").getAsString();
-        Class<? extends TenXObject> cl = EventDataClassLookup.classLookup.get(type);
-        return TenXObject.deserializeStripeObject(
-                eventDataObjectJson, cl != null ? cl : StripeRawJsonObject.class, responseGetter);
+    public static TenXObject deserializeTenXObject(
+            String payload, TenXResponseGetter responseGetter) {
+        JsonObject jsonObject = ApiResource.GSON.fromJson(payload, JsonObject.class).getAsJsonObject();
+        return deserializeTenXObject(jsonObject, responseGetter);
     }
 
-    public static TenXObject deserializeStripeObject(
+    static TenXObject deserializeTenXObject(
+            JsonObject eventDataObjectJson, TenXResponseGetter responseGetter) {
+        String type = eventDataObjectJson.getAsJsonObject().get("object").getAsString();
+        Class<? extends TenXObject> cl = com.example.spring_boot.model.EventDataClassLookup.classLookup.get(type);
+        return TenXObject.deserializeTenXObject(
+                eventDataObjectJson, cl != null ? cl : TenXRawJsonObject.class, responseGetter);
+    }
+
+    public static TenXObject deserializeTenXObject(
             JsonObject payload, Type type, TenXResponseGetter responseGetter) {
         TenXObject object = ApiResource.INTERNAL_GSON.fromJson(payload, type);
 
-        if (object instanceof StripeActiveObject) {
-            ((StripeActiveObject) object).setResponseGetter(responseGetter);
+        if (object instanceof TenXActiveObject) {
+            ((TenXActiveObject) object).setResponseGetter(responseGetter);
         }
 
         return object;
     }
 
+
+    public static TenXObject deserializeTenXObject(
+            String payload, Type type, TenXResponseGetter responseGetter) {
+        TenXObject object = ApiResource.INTERNAL_GSON.fromJson(payload, type);
+
+        if (object instanceof TenXActiveObject) {
+            ((TenXActiveObject) object).setResponseGetter(responseGetter);
+        }
+
+        return object;
+    }
 }

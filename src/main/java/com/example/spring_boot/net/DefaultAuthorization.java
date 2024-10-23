@@ -7,12 +7,13 @@ import org.springframework.util.StringUtils;
 public class DefaultAuthorization implements Authorization {
 
     private final String apiKey;
-     public DefaultAuthorization(String apiKey) {
-         if (apiKey == null) {
-             throw new IllegalArgumentException("apiKey should be not-null");
-         }
-         this.apiKey = apiKey;
-     }
+
+    public DefaultAuthorization(String apiKey) {
+        if (apiKey == null) {
+            throw new IllegalArgumentException("apiKey should be not-null");
+        }
+        this.apiKey = apiKey;
+    }
 
     public String getApiKey() {
         return this.apiKey;
@@ -35,5 +36,5 @@ public class DefaultAuthorization implements Authorization {
         }
         return request.withAdditionalHeader("Authorization", String.format("Bearer %s", apiKey));
     }
-    }
 }
+

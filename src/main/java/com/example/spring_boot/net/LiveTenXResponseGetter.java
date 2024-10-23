@@ -1,7 +1,12 @@
 package com.example.spring_boot.net;
 
+import com.example.spring_boot.exception.ApiConnectionException;
+import com.example.spring_boot.exception.ApiException;
 import com.example.spring_boot.exception.TenXException;
 import com.example.spring_boot.model.TenXObjectInterface;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSyntaxException;
 
 import java.io.InputStream;
@@ -15,6 +20,10 @@ public class LiveTenXResponseGetter implements TenXResponseGetter {
 
     public LiveTenXResponseGetter(HttpClient httpClient) {
         this(null, httpClient);
+    }
+
+    public LiveTenXResponseGetter() {
+        this(null, null);
     }
 
 
@@ -54,33 +63,23 @@ public class LiveTenXResponseGetter implements TenXResponseGetter {
         RequestOptions mergedOptions = RequestOptions.merge(this.options, apiRequest.getOptions());
 
         TenXRequest request = toTenXRequest(apiRequest, mergedOptions);
-        TenXResponse response =
-                sendWithTelemetry(request, apiRequest.getUsage(), r -> httpClient.requestWithRetries(r));
+        TenXResponse response = httpClient.requestWithRetries(request);
 
         int responseCode = response.code();
         String responseBody = response.body();
-        String requestId = response.requestId();
 
         if (responseCode < 200 || responseCode >= 300) {
-            handleError(response, apiRequest.getApiMode());
+            handleError(response);
         }
 
         T resource = null;
         try {
-            resource = (T) ApiResource.deserializeStripeObject(responseBody, typeToken, this);
+            resource = (T) ApiResource.deserializeTenXObject(responseBody, typeToken, this);
         } catch (JsonSyntaxException e) {
-            throw makeMalformedJsonError(responseBody, responseCode, requestId, e);
+            throw makeMalformedJsonError(responseBody, responseCode, e);
         }
 
-        if (resource instanceof StripeCollectionInterface<?>) {
-            ((StripeCollectionInterface<?>) resource).setRequestOptions(apiRequest.getOptions());
-            ((StripeCollectionInterface<?>) resource).setRequestParams(apiRequest.getParams());
-        }
-
-        if (resource instanceof com.stripe.model.v2.StripeCollection<?>) {
-            ((com.stripe.model.v2.StripeCollection<?>) resource)
-                    .setRequestOptions(apiRequest.getOptions());
-        }
+        //Implement Collection Interface here if needed
 
         resource.setLastResponse(response);
 
@@ -91,6 +90,23 @@ public class LiveTenXResponseGetter implements TenXResponseGetter {
         return new HttpURLConnectionClient();
     }
 
+    private void handleError(TenXResponse response) throws TenXException {
+        JsonObject responseBody = ApiResource.GSON.fromJson(response.body(), JsonObject.class);
+        throw new ApiConnectionException("not implemented");
+    }
+
+    private static ApiException makeMalformedJsonError(
+            String responseBody, int responseCode, Throwable e) throws ApiException {
+        String details = e == null ? "none" : e.getMessage();
+        throw new ApiException(
+                String.format(
+                        "Invalid response object from API: %s. (HTTP response code was %d). Additional details: %s.",
+                        responseBody, responseCode, details),
+                null,
+                null,
+                responseCode,
+                e);
+    }
 
     private String fullUrl(BaseApiRequest apiRequest) {
         BaseAddress baseAddress = apiRequest.getBaseAddress();

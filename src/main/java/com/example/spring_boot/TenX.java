@@ -1,5 +1,8 @@
 package com.example.spring_boot;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.net.PasswordAuthentication;
 import java.net.Proxy;
 import java.util.HashMap;
@@ -13,19 +16,71 @@ public abstract class TenX {
     public static final String LIVE_API_BASE = "https://api.sandbox.10xbanking.com";
 
     public static volatile String apiKey;
+    @Getter @Setter
     public static volatile String actorId;
+    @Getter @Setter
+    public static volatile String actorType;
 
+    /**
+     * -- SETTER --
+     *  Sets the timeout value that will be used for making new connections to the Stripe API (in
+     *  milliseconds).
+     *
+     * @param timeout timeout value in milliseconds
+     */
+    @Setter
     private static volatile int connectTimeout = -1;
+    /**
+     * -- SETTER --
+     *  Sets the timeout value that will be used when reading data from an established connection to
+     *  the API (in milliseconds).
+     *  <p>Note that this value should be set conservatively because some API requests can take time
+     *  and a short timeout increases the likelihood of causing a problem in the backend.
+     *
+     * @param timeout timeout value in milliseconds
+     */
+    @Setter
     private static volatile int readTimeout = -1;
 
 
+    /**
+     * -- GETTER --
+     *  Returns the maximum number of times requests will be retried.
+     *
+     *
+     * -- SETTER --
+     *  Sets the maximum number of times requests will be retried.
+     *
+     @return the maximum number of times requests will be retried
+      * @param numRetries the maximum number of times requests will be retried
+     */
+    @Setter @Getter
     private static volatile int maxNetworkRetries = 2;
 
+    @Getter @Setter
     private static volatile String apiBase = LIVE_API_BASE;
+    @Getter @Setter
     private static volatile String testConnectivity = TEST_CONNECTIVITY;
 
+    /**
+     * -- SETTER --
+     *  Set proxy to tunnel all connections.
+     *
+     * @param proxy proxy host and port setting
+     */
+    @Getter
+    @Setter
     private static volatile Proxy connectionProxy = null;
+    /**
+     * -- SETTER --
+     *  Provide credential for proxy authorization if required.
+     *
+     * @param auth proxy required userName and password
+     */
+    @Getter
+    @Setter
     private static volatile PasswordAuthentication proxyCredential = null;
+    @Getter
     private static volatile Map<String, String> appInfo = null;
 
     /**
@@ -34,24 +89,6 @@ public abstract class TenX {
      */
     public static void overrideApiBase(final String overriddenApiBase) {
         apiBase = overriddenApiBase;
-    }
-
-    public static String getApiBase() {
-        return apiBase;
-    }
-
-
-    /**
-     * Set proxy to tunnel all connections.
-     *
-     * @param proxy proxy host and port setting
-     */
-    public static void setConnectionProxy(final Proxy proxy) {
-        connectionProxy = proxy;
-    }
-
-    public static Proxy getConnectionProxy() {
-        return connectionProxy;
     }
 
     /**
@@ -68,16 +105,6 @@ public abstract class TenX {
     }
 
     /**
-     * Sets the timeout value that will be used for making new connections to the Stripe API (in
-     * milliseconds).
-     *
-     * @param timeout timeout value in milliseconds
-     */
-    public static void setConnectTimeout(final int timeout) {
-        connectTimeout = timeout;
-    }
-
-    /**
      * Returns the read timeout.
      *
      * @return timeout value in milliseconds
@@ -87,50 +114,6 @@ public abstract class TenX {
             return DEFAULT_READ_TIMEOUT;
         }
         return readTimeout;
-    }
-
-    /**
-     * Sets the timeout value that will be used when reading data from an established connection to
-     * the API (in milliseconds).
-     *
-     * <p>Note that this value should be set conservatively because some API requests can take time
-     * and a short timeout increases the likelihood of causing a problem in the backend.
-     *
-     * @param timeout timeout value in milliseconds
-     */
-    public static void setReadTimeout(final int timeout) {
-        readTimeout = timeout;
-    }
-
-    /**
-     * Returns the maximum number of times requests will be retried.
-     *
-     * @return the maximum number of times requests will be retried
-     */
-    public static int getMaxNetworkRetries() {
-        return maxNetworkRetries;
-    }
-
-    /**
-     * Sets the maximum number of times requests will be retried.
-     *
-     * @param numRetries the maximum number of times requests will be retried
-     */
-    public static void setMaxNetworkRetries(final int numRetries) {
-        maxNetworkRetries = numRetries;
-    }
-
-    /**
-     * Provide credential for proxy authorization if required.
-     *
-     * @param auth proxy required userName and password
-     */
-    public static void setProxyCredential(final PasswordAuthentication auth) {
-        proxyCredential = auth;
-    }
-
-    public static PasswordAuthentication getProxyCredential() {
-        return proxyCredential;
     }
 
     public static void setAppInfo(String name) {
@@ -158,10 +141,6 @@ public abstract class TenX {
         appInfo.put("version", version);
         appInfo.put("url", url);
         appInfo.put("partner_id", partnerId);
-    }
-
-    public static Map<String, String> getAppInfo() {
-        return appInfo;
     }
 
 }
