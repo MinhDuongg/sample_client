@@ -1,7 +1,10 @@
 package com.example.spring_boot;
 
+import com.example.spring_boot.net.Authorization;
 import com.example.spring_boot.net.LiveTenXResponseGetter;
 import com.example.spring_boot.net.TenXResponseGetter;
+
+import java.net.Proxy;
 
 public class TenXClient {
     private final TenXResponseGetter responseGetter;
@@ -15,7 +18,17 @@ public class TenXClient {
                 new LiveTenXResponseGetter(builder().setApiKey(apiKey).buildOptions(), null);
     }
 
-    public static StripeClientBuilder builder() {
+    public static TenxCli builder() {
         return new StripeClientBuilder();
+    }
+
+    public static final class TenXClientBuilder {
+        private Authorization authenticator;
+        private String actorID;
+        private String actorType;
+        private int connectTimeout = TenX.DEFAULT_CONNECT_TIMEOUT;
+        private int readTimeout = TenX.DEFAULT_READ_TIMEOUT;
+        private int maxNetworkRetries;
+        private Proxy connectionProxy;
     }
 }
